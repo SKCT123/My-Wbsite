@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tradingview Course</title>
+    <link href="styles.css" rel="stylesheet"/>
+    <script src="https://s3.tradingview.com/tv.js"></script>
+    <script>
+        function clearContent() {
+            document.body.innerHTML = `
+            <div class="container">
+                ${generateCourse()}
+            </div>`;
+        }
+
+        function generateCourse() {
+            const course = [
+                "Part 1",
+                "Part 2",
+                "Part 3",
+                "Part 4",
+                "Part 5"
+            ];
+            return course.map((title, index) => `
+            <div class="course-item" onclick="showCourseTab(${index + 1})">
+                <div class="part">${index + 1}</div>
+                <div class="content">
+                    <img src="https://static.thenounproject.com/png/2161804-200.png" alt="${title} Icon" class="icon">
+                    <span>${title}</span>
+                </div>
+            </div>
+            `).join('');
+        }
+
+        function showCourseTab(partNumber) {
+            document.body.innerHTML = `
+            <h1 class="part-title">Part ${partNumber}</h1>
+            <div class="course-tab-container">
+                <div class="course-info">
+                    <h2>Part ${partNumber} - Course Content</h2>
+                    <p>This is the course content for Part ${partNumber}. Click on a section to complete it.</p>
+                    <div class="course-buttons">
+                        ${generateCourseButtons(partNumber)}
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        function generateCourseButtons(partNumber) {
+            const sections = 10; // Assume each part has 10 sections
+            let buttonsHtml = '';
+            for (let i = 1; i <= sections; i++) {
+                buttonsHtml += `<button class="course-button" onclick="markComplete(this, ${partNumber}, ${i})" title="Section ${i}">${i}</button>`;
+            }
+            return buttonsHtml;
+        }
+
+        function markComplete(button, partNumber, sectionNumber) {
+            button.classList.add('completed');
+            setTimeout(() => showCodingSpace(partNumber, sectionNumber), 500); // Show coding space after a delay
+        }
+
+        function showCodingSpace(partNumber, sectionNumber) {
+            document.body.innerHTML = `
+            <h1 class="part-title">Part ${partNumber} - Section ${sectionNumber}</h1>
+            <div class="container">
+                <!-- Instruction Section -->
+                <div class="instruction-section">
+                    <h2>Instructions</h2>
+                    <p>Type the following Pine Script code to create an RSI indicator:</p>
+                    <pre>
+rsiLength = input.int(defval = 14, title = "RSI Length")
+rsiSource = input.source(defval = close, title = "RSI Source")
+plot(ta.rsi(rsiSource, rsiLength))
+                    </pre>
+                </div>
+
+                <!-- Console Section -->
+                <div class="console-output-container">
+                    <div class="console-section">
+                        <textarea id="console-input" rows="10" cols="80" placeholder="Enter your Pine Script code here..."></textarea>
+                        <button class="run-button" onclick="updateChart()">Run</button>
+                    </div>
+
+                    <!-- Output Section -->
+                    <div class="output-section">
+                        <div id="output-window">Output will be displayed here...</div>
+                    </div>
+                </div>
+
+                <!-- TradingView Chart Section -->
+                <div class="tradingview-section">
+                    <div id="tradingview-window">TradingView chart will be displayed here...</div>
+                </div>
+            </div>`;
+        }
+
+        function updateChart() {
+            const inputScript = document.getElementById('console-input').value;
+
+            // Check for specific keywords to extract parameters
+            let rsiLengthMatch = inputScript.match(/rsiLength\s=\sinput\.int\(\sdefval\s=\s(\d+)/);
+            let rsiSourceMatch = inputScript.match(/rsiSource\s=\sinput\.source\(\sdefval\s=\s(\w+)/);
+
+            let rsiLength = rsiLengthMatch ? rsiLengthMatch[1] : 14;
+            let rsiSource = rsiSourceMatch ? rsiSourceMatch[1] : "close";
+
+            // Display the input in the output window
+            document.getElementById('output-window').innerText = `Executing script:\n${inputScript}`;
+
+            // Clear the previous TradingView widget if any
+            document.getElementById('tradingview-window').innerHTML = '';
+
+            // TradingView integration logic here
+            new TradingView.widget({
+                "container_id": "tradingview-window",
+                "width": 980,
+                "height": 610,
+                "symbol": "NASDAQ:AAPL",
+                "interval": "D",
+                "timezone": "Etc/UTC",
+                "theme": "light",
+                "style": "1",
+                "locale": "en",
+                "toolbar_bg": "#f1f3f6",
+                "enable_publishing": false,
+                "allow_symbol_change": true,
+                "hide_side_toolbar": false,
+                "details": true,
+                "studies": [
+                    `RSI@tv-basicstudies`,
+                    `plot(ta.rsi(${rsiSource}, ${rsiLength}))`
+                ],
+                "container_id": "tradingview-window"
+            });
+        }
+    </script>
+</head>
+<body>
+    <div class="menu">
+        <main>
+            <div class="course-title">
+                <h1>Tradingview Course By Resume</h1>
+            </div>
+            <button class="start-button" onclick="clearContent()">Click Here To Get Started!</button>
+        </main>
+    </div>
+    <!-- Dark Mode Toggle -->
+    <div class="dark-mode-toggle">
+        <label for="dark-mode-checkbox">Dark Mode</label>
+        <input type="checkbox" id="dark-mode-checkbox" onclick="toggleDarkMode()">
+    </div>
+    <script>
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+        }
+    </script>
+</body>
+</html>
+
